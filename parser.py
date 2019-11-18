@@ -1,3 +1,7 @@
+from method_pars import *
+from util import *
+
+
 def parentheses_skip(strings, i, par='{'):
     open_list = ["[", "{", "("]
     close_list = ["]", "}", ")"]
@@ -22,47 +26,48 @@ def parentheses_skip(strings, i, par='{'):
     return i + 1
 
 
-class Attribute:
-    type = ''
-    name = ''
-
-    def __init__(self, s):
-        self.type = s.split()[0]
-        self.name = s.split()[1]
-
-    def __str__(self):
-        return self.type + ':' + self.name
-
-
 class MethodDesc:
     comment = ''
     name = ''
     type = ''
     attributes = list()
+    keywords = list()
 
-    def __init__(self, d, c):
-        self.attributes = list()
-        self.comment = ' '.join(c.split())
-        def_string = d[0].split()
-        i = 0
-        while def_string[i] in useless_keywords_list:
-            i += 1
-        self.type = def_string[i]
-        self.name = def_string[i + 1][:def_string[i + 1].find('('):]
-        definition = def_string[i + 1][def_string[i + 1].find('(')::]
-        for k in range(i + 2, len(def_string)):
-            definition += ' ' + ' '.join(def_string[k].split())
-        for j in range(1, len(d)):
-            definition += ' ' + ' '.join(d[j].split())
-        for i in definition.split(','):
-            self.attributes.append(Attribute(i))
-
+    # def __init__(self, d, c):
+    #     self.attributes = list()
+    #     self.comment = ' '.join(c.split())
+    #     def_string = d[0].split()
+    #     i = 0
+    #     while def_string[i] in keywords_list:
+    #         i += 1
+    #     self.type = def_string[i]
+    #     self.name = def_string[i + 1][:def_string[i + 1].find('('):]
+    #     definition = def_string[i + 1][def_string[i + 1].find('(') + 1::]
+    #     for k in range(i + 2, len(def_string)):
+    #         definition += ' ' + ' '.join(def_string[k].split())
+    #     for j in range(1, len(d)):
+    #         definition += ' ' + ' '.join(d[j].split())
+    #     attributes = definition.split(',')
+    #
+    #     for i in range(len(attributes) - 1):
+    #         attribute = attributes[i].split()
+    #         self.attributes.append(Attribute(attribute[0], attribute[1]))
+    #     attribute = attributes[len(attributes) - 1].split()
+    #     attribute[1] = attribute[1][:attribute[1].find(')'):]
+    #     self.attributes.append(Attribute(attribute[0], attribute[1]))
     def __str__(self):
         return 'Description of ' + self.name + ' type:' + self.type + ' attributes:' + ' '.join(
             map(str, self.attributes)) + '\nComment:' + self.comment
 
+    def __init__(self):
+        self.attributes = list()
+        self.keywords = list()
 
-path = r'D:\code.cpp'
+    def add_attribute(self, attribute):
+        self.attributes.append(attribute)
+
+    def add_keyword(self, keyword):
+        self.keywords.append(keyword)
 
 
 def includes_check(include_list):
@@ -70,7 +75,7 @@ def includes_check(include_list):
     includes = []
     for i in include_list:
         if i.startswith('\"'):
-            file2 = open("d:\\" + i.replace('\"', ''));
+            file2 = open("d:\\" + i.replace('\"', ''))
             strings2 = file2.readlines()
             for i in range(len(strings2)):
                 if comment:
@@ -109,7 +114,6 @@ comment = False
 includes = list()
 descList = []
 temp_comment = ''
-useless_keywords_list = ['static', 'public', 'private', 'protected', 'final', 'abstract', 'virtual']
 
 
 class EnumDesc:
@@ -167,17 +171,17 @@ for i in range(len(strings)):
         i = k
         continue
 
-    if first_word_check(strings[i], useless_keywords_list):
+    if first_word_check(strings[i], keywords_list + st_data_types):
         defString = strings[i].split()
         for j in range(len(defString)):
-            if defString[j] in useless_keywords_list:
+            if defString[j] in keywords_list:
                 continue
             else:
                 j += 1
-                if defString[j].find('(') != -1:
-                    k = parentheses_skip(strings, i, '(')
-                    descList.append(MethodDesc(strings[i:k:], temp_comment))
-                # print(strings[i][strings[i].find(defString[j])::])
+                if j<len(defString) and defString[j].find('(') != -1: #check for name before '('
+                    method_desc = MethodDesc()
+                    i += method_parser(strings[i:], method_desc)
+                    descList.append(method_desc)
                 break
     # print(strings[i].split(' ',1)[0])
 for i in range(len(includes)):
