@@ -1,23 +1,27 @@
 from util import *
 from typename import TypeName
 
-def method_str_handler(string, method_desc):
+def structor_str_handler(string, structor_desc):
     init_str = string.strip().split()
     for i in range(len(init_str)):
         if init_str[i] in keywords_list:
-            method_desc.add_keyword(init_str[i])
+            structor_desc.add_keyword(init_str[i])
         else:
             break
     else:
         return
-    method_desc.type = init_str[i]
-    method_desc.name = init_str[i + 1].split('(', 1)[0]
+    structor_desc.name = init_str[i].split('(', 1)[0]
+    if structor_desc.name.startswith('~'):
+        structor_desc.type=False
+    else:
+        structor_desc.type=True
     ending = string.split('(')[1].split(')')
     params = ending[0].split(',')
     after_keywords = ending[1].split()
     for ends in after_keywords:
         if ends in keywords_list:
-            method_desc.add_keyword(ends)
+            structor_desc.add_keyword(ends)
+
     for param in params:
         parameter = TypeName()
         param_comps = param.split()
@@ -32,14 +36,14 @@ def method_str_handler(string, method_desc):
             continue
         parameter.set_type(param_comps[j].strip())
         parameter.set_name(param_comps[j + 1].strip())
-        method_desc.add_parameter(parameter)
+        structor_desc.add_parameter(param)
 
 
-def method_parser(strings, method_desc):
+def structor_parser(strings, method_desc):
     i = parentheses_skip(strings, 0, '(')
     method = ''
     for j in range(0, i):
         method += strings[j].strip()
-    method_str_handler(method, method_desc)
+    structor_str_handler(method, method_desc)
     k=parentheses_skip(strings,i)
     return k
