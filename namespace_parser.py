@@ -2,7 +2,10 @@ from util import *
 
 
 def namespace_def_handler(namespace_def, namespace_desc):
-    namespace_desc.set_name(namespace_def.split()[1])
+    if len(namespace_def.split())>1:
+        namespace_desc.set_name(namespace_def.split()[1])
+    else:
+        namespace_desc.set_name("DEFAULT")
 
 
 def namespace_parser(strings, namespace_desc):

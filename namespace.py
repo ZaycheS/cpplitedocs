@@ -14,7 +14,7 @@ class NamespaceDesc(Description):
 
     def __str__(self):
         string = "Namespace name:" + self.name
-        string+='\n ReLATEd:'+'\n'.join(map(str,self.descs_list))+'\nEND OF RELATED'
+        string+='\n ReLATEd:'+'\n'.join(map(str,self.descs_list))+'\nEND OF RELATED'+'\n'
         return string
 
     def set_name(self, name):

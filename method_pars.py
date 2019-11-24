@@ -1,6 +1,7 @@
 from util import *
 from typename import TypeName
 
+
 def method_str_handler(string, method_desc):
     init_str = string.strip().split()
     for i in range(len(init_str)):
@@ -11,10 +12,18 @@ def method_str_handler(string, method_desc):
     else:
         return
     method_desc.type = init_str[i]
-    method_desc.name = init_str[i + 1].split('(', 1)[0]
-    ending = string.split('(')[1].split(')')
-    params = ending[0].split(',')
-    after_keywords = ending[1].split()
+    method_desc.name = ''
+    for k in range(i + 1, len(init_str)):
+        if init_str[k].find('(') != -1:
+            method_desc.name += ' ' + init_str[k].split('(', 1)[0]
+            break
+        else:
+            method_desc.name += ' ' + init_str[k]
+    ending = string.split('(', 1)[1]
+    result = string_parentheses_skip(ending, '(')
+    ending = ending[result[1]:]
+    params = result[0]
+    after_keywords = ending.replace('{', '').replace(';', '').split()
     for ends in after_keywords:
         if ends in keywords_list:
             method_desc.add_keyword(ends)
@@ -31,15 +40,26 @@ def method_str_handler(string, method_desc):
         if param_comps[j] == 'void':
             continue
         parameter.set_type(param_comps[j].strip())
-        parameter.set_name(param_comps[j + 1].strip())
-        method_desc.add_parameter(parameter)
+        if j + 1 < len(param_comps):
+            parameter.set_name(param_comps[j + 1].strip())
+            method_desc.add_parameter(parameter)
 
 
 def method_parser(strings, method_desc):
-    i = parentheses_skip(strings, 0, '(')
+    # i = parentheses_skip(strings, 0, '(')
+    i = 0
+    stop = False
+    while not stop and i < len(strings):
+        for j in strings[i]:
+            if j == ';' or j == '{':
+                stop = True
+        i += 1
+
     method = ''
     for j in range(0, i):
         method += strings[j].strip()
     method_str_handler(method, method_desc)
-    k=parentheses_skip(strings,i)
+    if method.strip().endswith(';'):
+        return i
+    k = parentheses_skip(strings, i - 1)
     return k

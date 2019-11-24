@@ -1,6 +1,7 @@
 from util import *
 from typename import TypeName
 
+
 def structor_str_handler(string, structor_desc):
     init_str = string.strip().split()
     for i in range(len(init_str)):
@@ -12,15 +13,11 @@ def structor_str_handler(string, structor_desc):
         return
     structor_desc.name = init_str[i].split('(', 1)[0]
     if structor_desc.name.startswith('~'):
-        structor_desc.type=False
+        structor_desc.type = False
     else:
-        structor_desc.type=True
-    ending = string.split('(')[1].split(')')
-    params = ending[0].split(',')
-    after_keywords = ending[1].split()
-    for ends in after_keywords:
-        if ends in keywords_list:
-            structor_desc.add_keyword(ends)
+        structor_desc.type = True
+    ending = string.split('(', 1)[1]
+    params = string_parentheses_skip(ending, '(')[0]
 
     for param in params:
         parameter = TypeName()
@@ -35,15 +32,26 @@ def structor_str_handler(string, structor_desc):
         if param_comps[j] == 'void':
             continue
         parameter.set_type(param_comps[j].strip())
-        parameter.set_name(param_comps[j + 1].strip())
-        structor_desc.add_parameter(param)
+        if j + 1 > len(param_comps):
+            parameter.set_name(param_comps[j + 1].strip())
+            structor_desc.add_parameter(param)
 
 
-def structor_parser(strings, method_desc):
-    i = parentheses_skip(strings, 0, '(')
+def structor_parser(strings, structor_desc):
+    # i = parentheses_skip(strings, 0, '(')
+    i = 0
+    stop = False
+    while not stop and i < len(strings):
+        for j in strings[i]:
+            if j == ';' or j == '{':
+                stop = True
+        i += 1
+
     method = ''
     for j in range(0, i):
         method += strings[j].strip()
-    structor_str_handler(method, method_desc)
-    k=parentheses_skip(strings,i)
+    structor_str_handler(method, structor_desc)
+    if method.strip().endswith(';'):
+        return i
+    k = parentheses_skip(strings, i)
     return k

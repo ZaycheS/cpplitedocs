@@ -15,7 +15,7 @@ class StructorDesc(Description):
         string+=' attributes:' + ' '.join(
             map(str, self.attributes)) + '\nKeywords:' + ' '.join(
             map(str,
-                self.keywords)) + '\nBrief description:' + self.get_brief_desc() + '\nDetailed desription:\n' + self.get_detailed_desc()
+                self.keywords)) + '\nBrief description:' + self.get_brief_desc() + '\nDetailed desription:\n' + self.get_detailed_desc()+'\n'
         return string
 
     def __init__(self):

@@ -23,7 +23,7 @@ class TypeName(Description):
         if self.get_brief_desc() != '':
             string += '\nBrief:' + self.get_brief_desc()
         if self.get_detailed_desc() != '':
-            string += '\nDetailed:' + self.get_detailed_desc()
+            string += '\nDetailed:' + self.get_detailed_desc()+'\t'
         return string
 
     def set_name(self, name):
