@@ -1,5 +1,5 @@
 from description import Description
-
+from typename import TypeName
 
 class StructorDesc(Description):
     name = ''

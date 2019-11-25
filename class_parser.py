@@ -5,12 +5,12 @@ from typename import TypeName
 def class_def_handler(class_def, class_desc):
     class_def_words = class_def.split()
     if len(class_def_words) > 1:
-        class_desc.set_name(class_def_words[1])
+        class_desc.set_name(class_def_words[1].replace('{',''))
     else:
         class_desc.set_name("DEFAULT")
 
-    if len(class_def_words) > 2 and class_def_words[2] == ':':
-        parent_defs = class_def_words[3:]
+    if len(class_def_words) > 2 and class_def.find(':') != -1:
+        parent_defs = class_def.split(':',1)[1].split()
         for parent_def_str in ' '.join(parent_defs).split(','):
             temp_parent = TypeName()
             parent_def = parent_def_str.split()
@@ -20,11 +20,22 @@ def class_def_handler(class_def, class_desc):
                     temp_parent.add_keyword(parent_def[j])
                 else:
                     break
-            temp_parent.set_name(parent_def[j])
+
+            temp_parent.set_name(parent_def[j].replace('{','').replace(';',''))
             class_desc.add_parent(temp_parent)
 
 
 def class_parser(strings, class_desc):
-    class_def_handler(strings[0], class_desc)
-    i = parentheses_skip(strings, 0, '{')
-    return i
+    i = 0
+    stop = False
+    while not stop and i < len(strings):
+        for j in strings[i]:
+            if j == ';' or j == '{':
+                stop = True
+        i += 1
+    class_str = ''
+    for j in range(0, i):
+        class_str += strings[j].strip()
+    class_def_handler(class_str, class_desc)
+    k = parentheses_skip(strings, i+1, '{')
+    return k,i

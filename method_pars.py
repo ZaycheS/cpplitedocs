@@ -19,6 +19,7 @@ def method_str_handler(string, method_desc):
             break
         else:
             method_desc.name += ' ' + init_str[k]
+    method_desc.name=method_desc.name.strip()
     ending = string.split('(', 1)[1]
     result = string_parentheses_skip(ending, '(')
     ending = ending[result[1]:]
@@ -61,5 +62,5 @@ def method_parser(strings, method_desc):
     method_str_handler(method, method_desc)
     if method.strip().endswith(';'):
         return i
-    k = parentheses_skip(strings, i - 1)
+    k = parentheses_skip(strings, 0)
     return k

@@ -11,34 +11,33 @@ from structor_parser import structor_parser
 from enumdesc import EnumDesc
 from enum_parser import enum_parser
 from enum_member import EnumMember
+from generating import *
 import os
 import string
 
 
-def structor_check(string, class_name=None):
-    def_string = string.split()
-    j = 0
+def structor_check(st_string):
+    def_string = st_string.split()
     for j in range(len(def_string)):
         if def_string[j] in keywords_list:
             continue
         else:
             if def_string[j].find('(') != -1:
-                # and (                   def_string[j].split('(', 1)[0] == class_name or def_string[j].split('(', 1)[0] == '~' + class_name):
                 return True
             else:
                 return False
     return False
 
 
-def method_signature_check(string):
-    defString = string.split()
-    for j in range(len(defString)):
-        if defString[j] in keywords_list:
+def method_signature_check(met_string):
+    def_string = met_string.split()
+    for j in range(len(def_string)):
+        if def_string[j] in keywords_list:
             continue
         else:
             j += 1
-            for k in range(j, len(defString)):
-                if defString[k].find('(') != -1 and defString[k].split('(', 1)[
+            for k in range(j, len(def_string)):
+                if def_string[k].find('(') != -1 and def_string[k].split('(', 1)[
                     0].strip() != '':
                     return True
             else:
@@ -46,25 +45,25 @@ def method_signature_check(string):
 
 
 def attr_signature_check(attr_string):
-    defString = attr_string.split()
-    j = 0
-
-    for j in range(len(defString)):
-        if defString[j] in keywords_list:
+    def_string = attr_string.split()
+    for j in range(len(def_string)):
+        if def_string[j] in keywords_list:
             continue
         else:
-            if (j + 1) < len(defString):
-                pr_type = defString[j].replace('*', '')
-                pr_name = defString[j + 1].replace(';', '').replace('*', '')
-                if pr_type.startswith(tuple(string.ascii_letters + '_')) and pr_name.isidentifier():
+            if (j + 1) < len(def_string):
+                pr_type = def_string[j].replace('*', '')
+                pr_name = def_string[j + 1].replace(';', '').replace('*', '')
+                if pr_type.startswith(tuple(string.ascii_letters + '_')) and (
+                        pr_name.isidentifier() or pr_name.split('[', 1)[0].isidentifier()):
                     return True
                 else:
                     return False
     return False
 
 
-def parser(strings, descs_list, parent=None):
+def parser(strings, descs_list, names_list, parent=None):
     includes = list()
+    defines = list()
     detailed_desc = ''
     brief_desc = ''
     __detailed_desc = False
@@ -95,21 +94,31 @@ def parser(strings, descs_list, parent=None):
         elif first_word_check(strings[i], '//'):
             i += 1
         else:
-            if strings[i].strip().startswith('#'):
-                i += 1
-                continue
             if strings[i].find('//') != -1:
                 strings[i] = strings[i][:strings[i].find('//')]
-            if first_word_check(strings[i], 'enum'):
+            if first_word_check(strings[i], '#include'):
+                include = strings[i].replace('\n', '')
+                includes.append(include)
+                i += 1
+            elif first_word_check(strings[i], '#define'):
+                define = strings[i].replace('\n', '')
+                defines.append(define)
+                i += 1
+            elif strings[i].strip().startswith('#'):
+                i += 1
+                continue
+            elif first_word_check(strings[i], 'enum'):
                 temp_enum = EnumDesc()
                 body_length = enum_parser(strings[i:], temp_enum)
-                parser(strings[i + 1:i + body_length - 1], temp_enum.enumers, temp_enum)
+                parser(strings[i + 1:i + body_length - 1], temp_enum.enumers,names_list, temp_enum)
+                names_list.append(temp_enum.name)
                 i += body_length
                 descs_list.append(temp_enum)
             elif isinstance(parent, EnumDesc):
-                if strings[i].strip().split(',')[0] != '':
+                if strings[i].strip().split(',')[0] != '' and strings[i].strip().replace('{', '') != '':
                     temp_token = EnumMember()
-                    temp_token.set_name(strings[i].strip().split(',')[0])
+                    temp_token.set_name(strings[i].strip().split(',')[0].split()[0])
+                    names_list.append(temp_token.name)
                     if detailed_desc != '':
                         temp_token.set_detailed_desc(detailed_desc)
                         detailed_desc = ''
@@ -118,25 +127,19 @@ def parser(strings, descs_list, parent=None):
                         brief_desc = ''
                     descs_list.append(temp_token)
                 i += 1
-            elif first_word_check(strings[i], '#include'):
-                include = strings[i].replace('\n', '')
-                includes.append(include[9:])
-                i += 1
-            elif first_word_check(strings[i], '#define'):
-                include = strings[i].replace('\n', '')
-                includes.append(include)
-                i += 1
             elif first_word_check(strings[i], ['class', 'struct']):
                 temp_class_desc = ClassDesc()
                 body_length = class_parser(strings[i:], temp_class_desc)
-                parser(strings[i + 1:i + body_length], temp_class_desc.descs_list, temp_class_desc)
-                i += body_length
+                parser(strings[i + body_length[1]:i + body_length[0]], temp_class_desc.descs_list,names_list, temp_class_desc)
+                names_list.append(temp_class_desc.name)
+                i += body_length[0] + body_length[1]
                 descs_list.append(temp_class_desc)
             elif first_word_check(strings[i], 'namespace'):
                 temp_namespace_desc = NamespaceDesc()
                 body_length = namespace_parser(strings[i:], temp_namespace_desc)
-                parser(strings[i + 1:i + body_length], temp_namespace_desc.descs_list)
+                parser(strings[i + 1:i + body_length], temp_namespace_desc.descs_list,names_list)
                 i += body_length
+                names_list.append(temp_namespace_desc.name)
                 descs_list.append(temp_namespace_desc)
             elif structor_check(strings[i]):
                 structor_desc = StructorDesc()
@@ -147,6 +150,7 @@ def parser(strings, descs_list, parent=None):
                     structor_desc.set_brief_desc(brief_desc)
                     brief_desc = ''
                 i += structor_parser(strings[i:], structor_desc)
+                names_list.append(structor_desc.name)
                 descs_list.append(structor_desc)
             elif method_signature_check(strings[i]):
                 method_desc = MethodDesc()
@@ -157,6 +161,8 @@ def parser(strings, descs_list, parent=None):
                     method_desc.set_brief_desc(brief_desc)
                     brief_desc = ''
                 i += method_parser(strings[i:], method_desc)
+                names_list.append(method_desc.name)
+                print(str(names_list)+" aaaaaaaaaaaa")
                 descs_list.append(method_desc)
             elif attr_signature_check(strings[i]):
                 def_string = strings[i].split()
@@ -174,6 +180,7 @@ def parser(strings, descs_list, parent=None):
                 if detailed_desc != '':
                     temp_attr.set_detailed_desc(detailed_desc)
                     detailed_desc = ''
+                names_list.append(temp_attr.name)
                 descs_list.append(temp_attr)
                 i += 1
             else:
@@ -189,7 +196,8 @@ class MethodDesc(Description):
         return 'Description of ' + self.name + ' type:' + self.type + ' attributes:' + ' '.join(
             map(str, self.attributes)) + '\nKeywords:' + ' '.join(
             map(str,
-                self.keywords)) + '\nBrief description:' + self.get_brief_desc() + '\nDetailed desription:\n' + self.get_detailed_desc() + '\n'
+                self.keywords)) + '\nBrief description:' + self.get_brief_desc() + '\nDetailed desсription:\n' \
+               + self.get_detailed_desc() + '\n'
 
     def __init__(self):
         self.comment = "Here must be description, but here isn't"
@@ -226,47 +234,71 @@ def includes_check(include_list):
             print(includes)
 
 
-def first_word_check(string, check):
+def first_word_check(chk_string, check):
     if isinstance(check, str):
-        if len(string.split(maxsplit=1)) > 0 and string.split(maxsplit=1)[0] == check:
+        if len(chk_string.split(maxsplit=1)) > 0 and chk_string.split(maxsplit=1)[0] == check:
             return True
         else:
             return False
-    elif len(string.split(maxsplit=1)) > 0 and string.split(maxsplit=1)[0] in check:
+    elif len(chk_string.split(maxsplit=1)) > 0 and chk_string.split(maxsplit=1)[0] in check:
         return True
     else:
         return False
 
 
-def file_iteration(rootdir=r'D:\irrlicht-master\source\Irrlicht\zlib'):
-    for subdir, dirs, files in os.walk(rootdir):
-
-        for file in files:
-            if file.endswith('.h') or file.endswith('.cpp'):
-                print(os.path.join(subdir, file))
-                file = open(os.path.join(subdir, file), 'r')
+def dir_parsing(path):
+    name_list = list()
+    if os.path.isdir(path):
+        for filename in os.listdir(path):
+            if filename.endswith(".cpp") or filename.endswith(".h") or filename.endswith(".hxx"):
+                file = open(os.path.join(path, filename), 'r')
                 strings = file.readlines()
                 file_desc_list = list()
-                parser(strings, file_desc_list)
-                # for i in range(len(includes)):
-                #     print(includes[i])
+                parser(strings, file_desc_list,name_list)
                 for i in range(len(file_desc_list)):
                     print(file_desc_list[i])
                 print(
-                    '/////////////////////////////////////////////END OF FILE////////////////////////////////////////')
+                    '/////////////////////////////////////////////////////END OF FILE////////////////////////////////////////')
+                continue
+            else:
+                continue
+        generate_index(name_list)
+    else:
+        print("Not a directory")
 
 
-# file_iteration(r'D:\irrlicht-master\source\Irrlicht')
-file = open(r'D:\irrlicht-master\source\Irrlicht\CIrrDeviceConsole.cpp', 'r')
-strings = file.readlines()
-file_desc_list = list()
-method_signature_check(strings[17])
-parser(strings, file_desc_list)
-# for i in range(len(includes)):
-#     print(includes[i])
-for i in range(len(file_desc_list)):
-    print(file_desc_list[i])
-# # for i in range(len(includes)):
-#     print(includes[i])
+def file_parsing(filename):
+    if os.path.isfile(filename):
+        if filename.endswith(".cpp") or filename.endswith(".h") or filename.endswith(".hxx"):
+            file = open(filename, 'r')
+            strings = file.readlines()
+            name_list=list()
+            file_desc_list = list()
+            parser(strings, file_desc_list,name_list)
+            generate_index(name_list)
+            for i in range(len(file_desc_list)):
+                print(file_desc_list[i])
+    else:
+        print("Not a file")
 
-# includesCheck(includes)
+
+def all_parsing(rootdir):
+    names_list = list()
+    if os.path.isdir(rootdir):
+        for subdir, dirs, files in os.walk(rootdir):
+            for file in files:
+                if file.endswith('.h') or file.endswith('.cpp') or file.endswith('.hxx'):
+                    print(os.path.join(subdir, file))
+                    file = open(os.path.join(subdir, file), 'r')
+                    strings = file.readlines()
+
+                    file_desc_list = list()
+                    parser(strings, file_desc_list,names_list)
+
+                    for i in range(len(file_desc_list)):
+                        print(file_desc_list[i])
+                    print(
+                        '/////////////////////////////////////////////END OF FILE////////////////////////////////////////')
+        generate_index(names_list)
+    else:
+        print("Not a directory")

@@ -12,7 +12,7 @@ def structor_str_handler(string, structor_desc):
     else:
         return
     structor_desc.name = init_str[i].split('(', 1)[0]
-    if structor_desc.name.startswith('~'):
+    if structor_desc.name.find('~')!=-1:
         structor_desc.type = False
     else:
         structor_desc.type = True
@@ -32,9 +32,9 @@ def structor_str_handler(string, structor_desc):
         if param_comps[j] == 'void':
             continue
         parameter.set_type(param_comps[j].strip())
-        if j + 1 > len(param_comps):
+        if j + 1 < len(param_comps):
             parameter.set_name(param_comps[j + 1].strip())
-            structor_desc.add_parameter(param)
+            structor_desc.add_parameter(parameter)
 
 
 def structor_parser(strings, structor_desc):
@@ -53,5 +53,6 @@ def structor_parser(strings, structor_desc):
     structor_str_handler(method, structor_desc)
     if method.strip().endswith(';'):
         return i
-    k = parentheses_skip(strings, i)
+    k = parentheses_skip(strings, 0)
+
     return k
