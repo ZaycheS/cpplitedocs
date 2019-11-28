@@ -2,7 +2,7 @@ from util import *
 
 
 def namespace_def_handler(namespace_def, namespace_desc):
-    if len(namespace_def.split())>1:
+    if len(namespace_def.split())>1 and namespace_def.split()[1].replace('{','')!='':
         namespace_desc.set_name(namespace_def.split()[1])
     else:
         namespace_desc.set_name("DEFAULT")

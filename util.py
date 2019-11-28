@@ -3,8 +3,23 @@ st_data_types = ['char', 'int', 'double', 'float', 'void', 'bool']
 path = r'D:\test.cpp'
 open_list = ["[", "{", "("]
 close_list = ["]", "}", ")"]
-useless_keyword_list = ['if', 'while', 'for', 'switch', ]
-version=0.1
+version = 0.1
+
+
+cards = "<h3>Detailed descriptions</h3>\n <hr>"
+card1 = "<div class=\"card\" style=\"width: 80%\"><div class=\"card-body\"><h5 class=\"card-title\">"
+
+card2 = "</h5><p class=\"card-text\">"
+card2_q="</p><hr><h6>Keywords</h6><p class=\"card-text\">"
+card2_5="</p><hr><h6>Parent classes</h6><p class=\"card-text\">"
+
+card3 = "</p><hr> <h6>Derived from that class</h6><p class=\"card-text\">"
+card3_2 = "</p><hr> <h6>Parameters</h6><p class=\"card-text\">"
+
+card4 = "</p><hr><h6>Belong to:</h6><p class=\"card-text\">"
+
+card5 = "</p></div></div><br>"
+
 
 def parentheses_skip(strings, i, par='{'):
     open_list = ["[", "{", "("]
@@ -14,7 +29,7 @@ def parentheses_skip(strings, i, par='{'):
     i = 0
     while stack and i < len(strings):
         j = 0
-        while i<len(strings) and j < len(strings[i]):
+        while i < len(strings) and j < len(strings[i]):
             if strings[i][j] in open_list:
                 if not start:
                     stack.append(strings[i][j])
@@ -39,9 +54,9 @@ def parentheses_skip(strings, i, par='{'):
                         j += 1
                     j += 1
 
-            if j+1<len(strings[i]) and strings[i][j] == '/' and strings[i][j + 1] == '/':
+            if j + 1 < len(strings[i]) and strings[i][j] == '/' and strings[i][j + 1] == '/':
                 i += 1
-                j=0
+                j = 0
                 continue
             j += 1
         if stack:

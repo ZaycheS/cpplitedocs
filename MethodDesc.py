@@ -1,14 +1,13 @@
-from description import Description
 from util import *
-
-class StructorDesc(Description):
+from description import Description
+class MethodDesc(Description):
     name = ''
-    type = bool()  # True-constructor False -destructor
+    type = ''
     parameters = list()
 
     def generate_name(self):
-        name = "Constructor " if self.type else "Destructor "
-        name += "<a href=#" + self.name + " >" + self.name + "</a>"
+        name = "Method "
+        name += "<a href=#" + self.name + " >" +self.type+" "+ self.name + "</a>"
         if self.get_brief_desc() != '':
             name += "<br>" + self.get_brief_desc()
         return "<li class=\"list-group-item\"><p>" + name + "</p></li>\n"
@@ -16,9 +15,9 @@ class StructorDesc(Description):
     def generate_card(self, parent_name=None):
         card = ''
         card += card1
-        card += "Constructor " if self.type else "Destructor "
         card += "<a " + "id=" + self.name + "></a>"
-        card += self.name if self.name != "DEFAULT" else ""
+        card += "Function "
+        card += self.type+" "+self.name if self.name != "DEFAULT" else ""
         card += card2
         card += str(self.get_detailed_desc())
         if len(self.keywords) > 0:
@@ -33,17 +32,13 @@ class StructorDesc(Description):
             card += card4 + " " + parent_name
         card += card5
         return card
+
     def __str__(self):
-        string = 'STRUCTOR OF ' + self.name + ' type:'
-        if self.type:
-            string += ' constructor'
-        else:
-            string += ' destructor'
-        string += ' attributes:' + ' '.join(
+        return 'Description of ' + self.name + ' type:' + self.type + ' attributes:' + ' '.join(
             map(str, self.parameters)) + '\nKeywords:' + ' '.join(
             map(str,
-                self.keywords)) + '\nBrief description:' + self.get_brief_desc() + '\nDetailed desription:\n' + self.get_detailed_desc() + '\n'
-        return string
+                self.keywords)) + '\nBrief description:' + self.get_brief_desc() + '\nDetailed desсription:\n' \
+               + self.get_detailed_desc() + '\n'
 
     def __init__(self):
         self.set_detailed_desc("Here must be description, but here isn't")
