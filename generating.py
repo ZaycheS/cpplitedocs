@@ -122,6 +122,9 @@ def generate_item(file_desc, includes, filename, name):
     cards += result[0]
     a = a.replace("<h3>Detailed descriptions</h3>", cards)
     a = a.replace("%DOCNAME%", name)
+    a=a.replace('\\code','<code>')
+    a = a.replace('\\endcode', '</code>')
+    a=a.replace("\\deprecated","<strong>DEPRECATED</strong>")
     a = a.replace("%ITEMNAME%", filename)
     result = open("1/items/" + filename + ".html", "w+")
     result.write(a)

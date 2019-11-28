@@ -101,7 +101,7 @@ def parser(strings, descs_list, names_list, parent=None, includes=None, filename
         elif first_word_check(strings[i], ['/**', '/*!']):
             if not strings[i].endswith('*/\n'):
                 __detailed_desc = True
-            detailed_desc = ' '.join(strings[i].split()[1::])
+            detailed_desc = ' '.join(strings[i].split()[1::]).replace('*/','')
             i += 1
         elif __detailed_desc:
             if strings[i].endswith('*/\n'):
