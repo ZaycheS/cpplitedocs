@@ -4,8 +4,8 @@ from typename import TypeName
 
 def enum_def_handler(enum_def, enum_desc):
     enum_def_words = enum_def.split()
-    if len(enum_def_words) > 1:
-        enum_desc.set_name(enum_def_words[1])
+    if len(enum_def_words) > 1 and enum_def_words[1].replace('{','')!="":
+        enum_desc.set_name(enum_def_words[1].replace('{',''))
     else:
         enum_desc.set_name("DEFAULT")
     temp_parent = TypeName()

@@ -1,19 +1,17 @@
-keywords_list = ['static', 'public', 'private', 'protected', 'const', 'abstract', 'virtual', 'friend', 'local']
-st_data_types = ['char', 'int', 'double', 'float', 'void', 'bool']
-path = r'D:\test.cpp'
+keywords_list = ['static', 'public', 'private', 'protected', 'const', 'abstract', 'virtual', 'friend', 'local',
+                 "unsigned"]
 open_list = ["[", "{", "("]
 close_list = ["]", "}", ")"]
-version = 0.1
-
+version = 1.0
 
 cards = "<h3>Detailed descriptions</h3>\n <hr>"
 card1 = "<div class=\"card\" style=\"width: 80%\"><div class=\"card-body\"><h5 class=\"card-title\">"
 
 card2 = "</h5><p class=\"card-text\">"
-card2_q="</p><hr><h6>Keywords</h6><p class=\"card-text\">"
-card2_5="</p><hr><h6>Parent classes</h6><p class=\"card-text\">"
+card2_q = "</p><hr><h6>Keywords</h6><p class=\"card-text\">"
+card2_5 = "</p><hr><h6>Parent classes</h6><p class=\"card-text\">"
 
-card3 = "</p><hr> <h6>Derived from that class</h6><p class=\"card-text\">"
+card3 = "</p><hr> <h6>Derived from that member</h6><p class=\"card-text\">"
 card3_2 = "</p><hr> <h6>Parameters</h6><p class=\"card-text\">"
 
 card4 = "</p><hr><h6>Belong to:</h6><p class=\"card-text\">"
@@ -30,6 +28,12 @@ def parentheses_skip(strings, i, par='{'):
     while stack and i < len(strings):
         j = 0
         while i < len(strings) and j < len(strings[i]):
+            if strings[i].strip().startswith('/*'):
+                while i < len(strings) and not strings[i].endswith('*/\n'):
+                    i += 1
+                else:
+                    if i >= len(strings):
+                        return len(strings)
             if strings[i][j] in open_list:
                 if not start:
                     stack.append(strings[i][j])
@@ -43,7 +47,7 @@ def parentheses_skip(strings, i, par='{'):
                         (open_list[pos] == stack[len(stack) - 1])):
                     stack.pop()
                 else:
-                    return 1
+                    return i
             if strings[i][j] == '\'' or strings[i][j] == '\"':
                 string_start = strings[i][j]
                 j += 1

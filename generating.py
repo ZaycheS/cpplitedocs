@@ -40,50 +40,60 @@ def generate_main_page(name, ver, desc):
     result.write(a)
 
 
-def generate_index(list_names,name):
+def generate_index(list_names, name):
     list_names.sort(reverse=True)
     f = open("index.html", 'r')
     a = f.read()
-    a=a.replace("%DOCNAME%",name)
+    a = a.replace("%DOCNAME%", name)
     for i in list_names:
         if len(i[0]) > 0:
             letter = i[0][0]
             finder = ""
-            finder += "<span class=\"badge badge-secondary\">" + letter.upper() + "</span><br>"
+            finder += "<h1><span class=\"badge badge-secondary\">" + letter.upper() + "</span></h1><br>"
             index = a.find(finder)
             if index >= 0:
                 print(i)
-                a = insert_char(a, index + len(finder),
-                                "<a href=\"items/" + i[1] + ".html#" + i[0] + "\">" + i[1] + ": " + i[0] + "</a><br>")
+                card = '<div class="row"><div class="col-sm-3 col-md-6 col-lg-4">' + "<a href=\"items/" + i[
+                    1] + ".html#" + i[0] + "\">" + i[
+                           0] + "</a>" + ' </div><div class="col-sm-9 col-md-6 col-lg-8"' + '>' + \
+                       i[
+                           1] + '</div></div>'
+                a = insert_char(a, index + len(finder), card)
     result = open("1/index.html", "w+")
     result.write(a)
 
 
-def generate_dirtree(rootdir, type,name):
+def generate_dirtree(rootdir, type, name):
     print("Generating dirtree")
 
     start = "<div class=\"list-group list-group-root well\">"
     f = open("dirtree.html", 'r')
     a = f.read()
-    a=a.replace('%DOCNAME%',name)
+    a = a.replace('%DOCNAME%', name)
     insertion = ""
+    main_ws = rootdir.count("\\")
     if type == 0:
         tree = os.walk(rootdir)
         count = 0
         for i in tree:
             emptydir = True
-            ws = i[0].count("/")
+            ws = i[0].count("\\") - main_ws
             if len(i[2]) > 0:
                 for k in i[2]:
                     if k.endswith(".cpp") or k.endswith('.h') or k.endswith('.hxx'):
                         emptydir = False
                 if not emptydir:
-                    insertion += "<a class =\"list-group-item\" >" + ws * '&nbsp' + i[0] + "</a>"
+                    insertion += "<a class =\"list-group-item list-group-item-secondary\" >" + "<pre>" + ws * "  " + (
+                        os.path.relpath(i[0], start=rootdir) if i[0] != rootdir else i[0]) + "</pre>" + "</a>"
                     for j in i[2]:
                         if j.endswith(".cpp") or j.endswith('.h') or j.endswith('hxx'):
                             count += 1
                             insertion += (
-                                    "<a href = \"items/" + j + ".html\" class =\"list-group-item\"" + "<span>" + "&nbsp&nbsp" * ws + "</span>" + j + "</a>")
+                                    "<a  href = \"items/" + j + ".html\" class =\"list-group-item list-group-item-action list-group-item-primary\">" + "<pre>" + (
+                                    ws + 1) * "  " + j + "</pre>" + "</a>")
+                else:
+                    insertion += "<a class =\"list-group-item list-group-item-secondary\" >" + "<pre>" + ws * "  " + (
+                        os.path.relpath(i[0], start=rootdir) if i[0] != rootdir else i[0]) + "</pre>" + "</a>"
 
     elif type == 1:
         insertion += "<a class =\"list-group-item\" >" + rootdir + "</a>"
@@ -91,11 +101,12 @@ def generate_dirtree(rootdir, type,name):
         for filename in os.listdir(rootdir):
             if filename.endswith(".cpp") or filename.endswith(".h") or filename.endswith(".hxx"):
                 insertion += (
-                        "<a href = \"items/" + filename + ".html\" class =\"list-group-item\"" +  "<span>" + "&nbsp&nbsp" * ws + "</span>" + filename + "</a>")
+                        "<a  href = \"items/" + filename + ".html\" class =\"list-group-item list-group-item-action list-group-item-primary\">" + "<pre>" + (
+                        ws + 1) * "  " + filename + "</pre>" + "</a>")
     else:
-        insertion += "<a href = \"items/" + os.path.basename(
-            rootdir) + ".html\" class =\"list-group-item\"" + "<span>" + "&nbsp&nbsp" * 1 + os.path.basename(
-            rootdir) + "</a>"
+        insertion += "<a  href = \"items/" + os.path.basename(
+            rootdir) + ".html\" class =\"list-group-item list-group-item-action list-group-item-primary\">" + "<pre>" + os.path.basename(
+            rootdir) + "</pre>" + "</a>"
     index = a.find(start)
     # print(index)
     a = insert_char(a, index + len(start), insertion)
@@ -115,16 +126,16 @@ def generate_item(file_desc, includes, filename, name):
     for k in includes:
         fusingline += k + "\n"
     fnamesline += result[1]
-
+    filename = os.path.basename(filename)
     fnamesline += "</ol>"
     a = a.replace("<h3>Import directives</h3>", fusingline)
     a = a.replace("<h3>Members list</h3>", fnamesline)
     cards += result[0]
     a = a.replace("<h3>Detailed descriptions</h3>", cards)
     a = a.replace("%DOCNAME%", name)
-    a=a.replace('\\code','<code>')
+    a = a.replace('\\code', '<code>')
     a = a.replace('\\endcode', '</code>')
-    a=a.replace("\\deprecated","<strong>DEPRECATED</strong>")
+    a = a.replace("\\deprecated", "<strong>DEPRECATED</strong>")
     a = a.replace("%ITEMNAME%", filename)
     result = open("1/items/" + filename + ".html", "w+")
     result.write(a)

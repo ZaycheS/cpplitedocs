@@ -24,10 +24,11 @@ class MethodDesc(Description):
             card += card2_q
             for i in self.keywords:
                 card += i + "&nbsp"
-        card += card3_2
-        for i in self.parameters:
-            if i.name is not None and i.name != "DEFAULT":
-                card += i.type+" "+i.name + "<br>"
+        if len(self.parameters) > 0:
+            card += card3_2
+            for i in self.parameters:
+                if i.name is not None and i.name != "DEFAULT":
+                    card += i.type+" "+i.name + "<br>"
         if parent_name is not None:
             card += card4 + " " + parent_name
         card += card5

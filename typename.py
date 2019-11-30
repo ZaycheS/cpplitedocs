@@ -26,7 +26,6 @@ class TypeName(Description):
         card += self.type+" "+self.name if self.name != "DEFAULT" else ""
         card += card2
         card += str(self.get_detailed_desc())
-        card += card3
         if parent_name is not None:
             card += card4 + " " + parent_name
         card += card5
