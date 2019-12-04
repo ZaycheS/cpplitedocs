@@ -13,7 +13,7 @@ class ClassDesc(Description):
         name = "Class " if self.type else "Structure "
         name += "<a href=#" + self.name + " >" + self.name + "</a>"
         if self.get_brief_desc() != '':
-            name += "<br>" + self.get_brief_desc()
+            name += "<br>" + "<pre>"+self.get_brief_desc()+"<pre>"
         return "<li class=\"list-group-item\"><p>"+name + "</p></li>\n"
 
     def __init__(self):
@@ -31,7 +31,7 @@ class ClassDesc(Description):
         card += self.name if self.name != "DEFAULT" else ""
         card += card2
         if self.get_detailed_desc()!='':
-            card+=self.get_detailed_desc()
+            card+="<pre>"+str(self.get_detailed_desc())+"</pre>"
         if len(self.keywords) > 0:
             card += card2_q
             for i in self.keywords:

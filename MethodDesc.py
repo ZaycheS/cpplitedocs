@@ -9,7 +9,7 @@ class MethodDesc(Description):
         name = "Method "
         name += "<a href=#" + self.name + " >" +self.type+" "+ self.name + "</a>"
         if self.get_brief_desc() != '':
-            name += "<br>" + self.get_brief_desc()
+            name += "<br>" +"<pre>" + self.get_brief_desc()+"</pre>"
         return "<li class=\"list-group-item\"><p>" + name + "</p></li>\n"
 
     def generate_card(self, parent_name=None):

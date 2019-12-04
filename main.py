@@ -46,15 +46,16 @@ def structor_check(st_string):
             continue
         else:
             if def_string[j].find('(') != -1:
-                return True,st_string
-            elif len(def_string)>j+1 and def_string[j+1].find('(') != -1 and def_string[j+1].split('(', 1)[0].strip() == '':
-                def_string[j+1] = def_string[j] + def_string[j+1]
+                return True, st_string
+            elif len(def_string) > j + 1 and def_string[j + 1].find('(') != -1 and def_string[j + 1].split('(', 1)[
+                0].strip() == '':
+                def_string[j + 1] = def_string[j] + def_string[j + 1]
                 def_string[j] = ''
                 st_string = ' '.join(def_string)
                 return True, st_string
             else:
                 return False, st_string
-    return False,st_string
+    return False, st_string
 
 
 def method_signature_check(met_string):
@@ -74,7 +75,7 @@ def method_signature_check(met_string):
                         met_string = ' '.join(def_string)
                         return True, met_string
                     else:
-                        return False,met_string
+                        return False, met_string
             else:
                 return False, met_string
     return False, met_string
@@ -97,7 +98,9 @@ def attr_signature_check(attr_string):
     return False
 
 
-def parser(strings, descs_list, names_list, parent=None, includes=None, filename=""):
+def parser(strings, descs_list, names_list, parent=None, includes=None, filename="", desc_file=None):
+    if desc_file is None:
+        desc_file = list()
     if includes is None:
         includes = list()
     defines = list()
@@ -106,7 +109,6 @@ def parser(strings, descs_list, names_list, parent=None, includes=None, filename
     __detailed_desc = False
     i = 0
     while i < len(strings):
-
         if first_word_check(strings[i], 'typedef'):
             strings[i] = strings[i][strings[i].find('typedef') + 7:]
         if first_word_check(strings[i], '//!'):
@@ -120,10 +122,13 @@ def parser(strings, descs_list, names_list, parent=None, includes=None, filename
         elif __detailed_desc:
             if strings[i].endswith('*/\n'):
                 __detailed_desc = False
+                if detailed_desc.find("\\file") != -1 or detailed_desc.find("@file") != -1:
+                    desc_file.append(detailed_desc)
+                    detailed_desc = ''
             elif first_word_check(strings[i], '*'):
-                detailed_desc += ' '.join(strings[i].split()[1::])
+                detailed_desc += "<br>" + ' '.join(strings[i].split()[1::])
             else:
-                detailed_desc += ' ' + strings[i]
+                detailed_desc += '<br>' + strings[i]
             i += 1
         elif first_word_check(strings[i], '/*'):
             while i < len(strings) and not strings[i].endswith('*/\n'):
@@ -134,7 +139,7 @@ def parser(strings, descs_list, names_list, parent=None, includes=None, filename
         elif strings[i].strip().startswith('\'') or strings[i].strip().startswith('\"'):
             i += 1
         elif strings[i].strip().startswith("using"):
-            i+=1
+            i += 1
         else:
             if strings[i].find('/*') != -1:
                 strings[i] = strings[i][:strings[i].find('/*')]
@@ -168,7 +173,7 @@ def parser(strings, descs_list, names_list, parent=None, includes=None, filename
             elif isinstance(parent, EnumDesc):
                 if strings[i].strip().split(',')[0] != '' and strings[i].strip().replace('{', '') != '':
                     temp_token = EnumMember()
-                    temp_token.set_name(strings[i].strip()[:strings[i].rfind(",")].split()[0].replace(",",''))
+                    temp_token.set_name(strings[i].strip()[:strings[i].rfind(",")].split()[0].replace(",", ''))
                     names_list.append(tuple([temp_token.name, filename]))
                     if detailed_desc != '':
                         temp_token.set_detailed_desc(detailed_desc)
@@ -201,7 +206,7 @@ def parser(strings, descs_list, names_list, parent=None, includes=None, filename
                 names_list.append(tuple([temp_namespace_desc.name, filename]))
                 descs_list.append(temp_namespace_desc)
             elif structor_check(strings[i])[0]:
-                strings[i]=structor_check(strings[i])[1]
+                strings[i] = structor_check(strings[i])[1]
                 structor_desc = StructorDesc()
                 if detailed_desc != '':
                     structor_desc.set_detailed_desc(detailed_desc)
@@ -232,7 +237,7 @@ def parser(strings, descs_list, names_list, parent=None, includes=None, filename
                         temp_attr.add_keyword(def_string[l])
                     else:
                         temp_attr.set_type(def_string[l])
-                        temp_attr.set_name(def_string[l + 1].replace(';', '').split('=',1)[0])
+                        temp_attr.set_name(def_string[l + 1].replace(';', '').split('=', 1)[0])
                         break
                 if brief_desc != '':
                     temp_attr.set_brief_desc(brief_desc)
@@ -300,8 +305,9 @@ def dir_parsing(path, proj_name, proj_ver):
                 strings = file.readlines()
                 file_desc_list = list()
                 includes = list()
-                parser(strings, file_desc_list, name_list, None, includes, filename)
-                generate_item(file_desc_list, includes, filename, proj_name)
+                desc_file=list()
+                parser(strings, file_desc_list, name_list, None, includes, filename,desc_file=desc_file)
+                generate_item(file_desc_list, includes, filename, proj_name,desc_file=desc_file)
                 print(os.path.join(path, os.path.basename(file.name)))
                 continue
             else:
@@ -322,8 +328,9 @@ def file_parsing(filename, proj_name, proj_ver):
             name_list = list()
             file_desc_list = list()
             includes = list()
-            parser(strings, file_desc_list, name_list, None, includes, filename)
-            generate_item(file_desc_list, includes, filename, proj_name)
+            desc_file=list()
+            parser(strings, file_desc_list, name_list, None, includes, filename,desc_file=desc_file)
+            generate_item(file_desc_list, includes, filename, proj_name,desc_file)
             generate_index(name_list, proj_name)
             generate_dirtree(filename, 2, proj_name)
     else:
@@ -347,8 +354,9 @@ def all_parsing(rootdir, proj_name, proj_ver):
 
                     file_desc_list = list()
                     includes = list()
-                    parser(strings, file_desc_list, names_list, None, includes, os.path.basename(file.name))
-                    generate_item(file_desc_list, includes, os.path.basename(file.name), proj_name)
+                    desc_file=list()
+                    parser(strings, file_desc_list, names_list, None, includes, os.path.basename(file.name),desc_file=desc_file)
+                    generate_item(file_desc_list, includes, os.path.basename(file.name), proj_name,desc_file)
                     print(os.path.join(subdir, os.path.basename(file.name)))
         generate_index(names_list, proj_name)
         generate_dirtree(rootdir, 0, proj_name)

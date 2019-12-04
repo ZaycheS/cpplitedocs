@@ -115,7 +115,7 @@ def generate_dirtree(rootdir, type, name):
     result.write(a)
 
 
-def generate_item(file_desc, includes, filename, name):
+def generate_item(file_desc, includes, filename, name, desc_file):
     f = open("item.html", 'r')
     a = f.read()
     fusingline = " <h3>Included files:</h3>\n"
@@ -130,12 +130,18 @@ def generate_item(file_desc, includes, filename, name):
     fnamesline += "</ol>"
     a = a.replace("<h3>Import directives</h3>", fusingline)
     a = a.replace("<h3>Members list</h3>", fnamesline)
+    if len(desc_file) > 0:
+        a = a.replace("%FILEDESC%", '<div class = "jumbotron j">' + desc_file[0] + '</div>')
+    else:
+        a = a.replace("%FILEDESC%", '')
     cards += result[0]
     a = a.replace("<h3>Detailed descriptions</h3>", cards)
     a = a.replace("%DOCNAME%", name)
     a = a.replace('\\code', '<code>')
     a = a.replace('\\endcode', '</code>')
-    a = a.replace("\\deprecated", "<strong>DEPRECATED</strong>")
+    a = a.replace('@code', '<code>')
+    a = a.replace('@endcode', '</code>')
+    a = a.replace("\\deprecated", "<strong>DEPRECATED<br></strong>")
     a = a.replace("%ITEMNAME%", filename)
     result = open("1/items/" + filename + ".html", "w+")
     result.write(a)

@@ -4,12 +4,22 @@ from typename import TypeName
 
 def class_def_handler(class_def, class_desc):
     class_def_words = class_def.split()
+    i = 1
     if len(class_def_words) > 1:
-        class_desc.set_name(class_def_words[1].replace('{', '').replace(';', ''))
+        for k in range(i, len(class_def_words)):
+            if class_def_words[k].find('(') != -1 or class_def_words[k].find('{') != -1 or class_def_words[k].find(
+                    ';') != -1 or class_def_words[k].find(':') != -1:
+                class_desc.name += ' ' + class_def_words[i].replace('{', '').replace(';', '').replace(':', '').replace(
+                    '(', '')
+                i+=1
+                break
+            else:
+                class_desc.name += ' ' + class_def_words[k]
+                i+=1
     else:
         class_desc.set_name("DEFAULT")
 
-    if len(class_def_words) > 2 and class_def.find(':') != -1:
+    if len(class_def_words) > i and class_def.find(':') != -1:
         parent_defs = class_def.split(':', 1)[1].split()
         for parent_def_str in ' '.join(parent_defs).split(','):
             temp_parent = TypeName()
@@ -41,4 +51,5 @@ def class_parser(strings, class_desc):
         k = parentheses_skip(strings, i, '{')
     else:
         k = 0
+        i = 1
     return k, i

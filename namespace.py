@@ -11,7 +11,7 @@ class NamespaceDesc(Description):
         name = "Namescpace "
         name += "<a href=#"+self.name+" >"+self.name+"</a>"
         if self.get_brief_desc() != '':
-            name += "<br>" + self.get_brief_desc()
+            name += "<br>" + "<pre>" + self.get_brief_desc()+"</pre>"
         return "<li class=\"list-group-item\"><p>" + name + "</p></li>\n"
 
     def generate_card(self, parent_name):
@@ -21,7 +21,7 @@ class NamespaceDesc(Description):
         card += "Namespace "
         card += self.name if self.name != "DEFAULT" else ""
         card += card2
-        card += str(self.get_detailed_desc())
+        card += "<pre>"+str(self.get_detailed_desc())+"</pre>"
         if len(self.keywords) > 0:
             card += card2_q
             for i in self.keywords:

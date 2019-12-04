@@ -15,7 +15,7 @@ class TypeName(Description):
         name = "Attribute "
         name += "<a href=#" + self.name + " >" +self.type+" "+ self.name + "</a>"
         if self.get_brief_desc() != '':
-            name += "<br>" + self.get_brief_desc()
+            name += "<br>" +"<pre>" + self.get_brief_desc()+"</pre>"
         return "<li class=\"list-group-item\"><p>" + name + "</p></li>\n"
 
     def generate_card(self, parent_name=None):
@@ -25,7 +25,7 @@ class TypeName(Description):
         card += "Attribute "
         card += self.type+" "+self.name if self.name != "DEFAULT" else ""
         card += card2
-        card += str(self.get_detailed_desc())
+        card += "<pre>"+str(self.get_detailed_desc())+"</pre>"
         if parent_name is not None:
             card += card4 + " " + parent_name
         card += card5

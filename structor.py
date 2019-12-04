@@ -1,6 +1,7 @@
 from description import Description
 from util import *
 
+
 class StructorDesc(Description):
     name = ''
     type = bool()  # True-constructor False -destructor
@@ -10,7 +11,7 @@ class StructorDesc(Description):
         name = "Constructor " if self.type else "Destructor "
         name += "<a href=#" + self.name + " >" + self.name + "</a>"
         if self.get_brief_desc() != '':
-            name += "<br>" + self.get_brief_desc()
+            name += "<br>" + "<pre>" + self.get_brief_desc() + "</pre>"
         return "<li class=\"list-group-item\"><p>" + name + "</p></li>\n"
 
     def generate_card(self, parent_name=None):
@@ -20,7 +21,7 @@ class StructorDesc(Description):
         card += "<a " + "id=" + self.name + "></a>"
         card += self.name if self.name != "DEFAULT" else ""
         card += card2
-        card += str(self.get_detailed_desc())
+        card += "<pre>" + str(self.get_detailed_desc()) + "</pre>"
         if len(self.keywords) > 0:
             card += card2_q
             for i in self.keywords:
@@ -29,11 +30,12 @@ class StructorDesc(Description):
             card += card3_2
             for i in self.parameters:
                 if i.name is not None and i.name != "DEFAULT":
-                    card += i.type+" "+i.name + "<br>"
+                    card += i.type + " " + i.name + "<br>"
         if parent_name is not None:
             card += card4 + " " + parent_name
         card += card5
         return card
+
     def __str__(self):
         string = 'STRUCTOR OF ' + self.name + ' type:'
         if self.type:

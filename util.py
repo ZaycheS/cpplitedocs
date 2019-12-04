@@ -84,10 +84,19 @@ def string_parentheses_skip(string, par='{'):
                     (open_list[pos] == stack[len(stack) - 1])):
                 stack.pop()
             else:
-                return 1
+                return list(),1
         elif string[i] == ',' and len(stack) == 1:
             par_list.append(string[j:i])
             j = i + 1
+        if string[i] == '\'' or string[i]== '\"':
+            string_start = string[i]
+            i += 1
+            while i < len(string):
+                if string== string_start:
+                    break
+                if string[i]== '\\':
+                    i += 1
+                i += 1
         i += 1
     par_list.append(string[j:i - 1])
     return par_list, i
