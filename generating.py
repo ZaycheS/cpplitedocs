@@ -23,6 +23,7 @@ def iterate_through(descs_list, parent_name=None, big_types=(ClassDesc, Namespac
             elif isinstance(i, EnumDesc):
                 parent_name = "Enumeration " + i.name
             result = iterate_through(i.descs_list, parent_name)
+            parent_name=None
             cards += result[0]
             names += result[1]
     return cards, names
@@ -54,7 +55,9 @@ def generate_index(list_names, name):
             if index >= 0:
                 print(i)
                 card = '<div class="row"><div class="col-sm-3 col-md-6 col-lg-4">' + "<a href=\"items/" + i[
-                    1] + ".html#" + i[0] + "\">" + i[
+                    1].replace('<', '&lt'
+                               ).replace('>', '&gt') + ".html#" + i[0].replace('<', '&lt'
+                                                                               ).replace('>', '&gt') + "\">" + i[
                            0] + "</a>" + ' </div><div class="col-sm-9 col-md-6 col-lg-8"' + '>' + \
                        i[
                            1] + '</div></div>'

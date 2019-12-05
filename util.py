@@ -1,5 +1,5 @@
 keywords_list = ['static', 'public', 'private', 'protected', 'const', 'abstract', 'virtual', 'friend', 'local',
-                 "unsigned"]
+                 "unsigned",'template','extern']
 open_list = ["[", "{", "("]
 close_list = ["]", "}", ")"]
 version = 1.0

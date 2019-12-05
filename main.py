@@ -76,6 +76,8 @@ def method_signature_check(met_string):
                         return True, met_string
                     else:
                         return False, met_string
+                if def_string[k].find('=')!=-1:
+                    return False,met_string
             else:
                 return False, met_string
     return False, met_string
@@ -193,7 +195,8 @@ def parser(strings, descs_list, names_list, parent=None, includes=None, filename
                     brief_desc = ''
                 body_length = class_parser(strings[i:], temp_class_desc)
                 temp_class_desc.type = first_word_check(strings[i], 'class')
-                parser(strings[i + body_length[1]:i + body_length[0]], temp_class_desc.descs_list, names_list,
+                if(body_length[0]+body_length[1]>1):
+                    parser(strings[i + body_length[1]:i + body_length[0]], temp_class_desc.descs_list, names_list,
                        temp_class_desc, filename=filename)
                 names_list.append(tuple([temp_class_desc.name, filename]))
                 i += body_length[0] + body_length[1]
@@ -296,6 +299,10 @@ def dir_parsing(path, proj_name, proj_ver):
         proj_file = open(os.path.join(path, "readme.txt"))
         proj_doc = proj_file.read()
         generate_main_page(proj_name, proj_ver, "<pre>" + proj_doc + "</pre>")
+    elif os.path.isfile(os.path.join(path, "README.md")):
+        proj_file = open(os.path.join(path, "README.md"))
+        proj_doc = proj_file.read()
+        generate_main_page(proj_name, proj_ver, "<pre>" + proj_doc + "</pre>")
     else:
         generate_main_page(proj_name, proj_ver, "")
     if os.path.isdir(path):
@@ -343,6 +350,10 @@ def all_parsing(rootdir, proj_name, proj_ver):
         proj_file = open(os.path.join(rootdir, "readme.txt"))
         proj_doc = proj_file.read()
         generate_main_page(proj_name, proj_ver, "<pre>" + proj_doc + "</pre>")
+    elif os.path.isfile(os.path.join(rootdir, "README.md")):
+        proj_file = open(os.path.join(rootdir, "README.md"))
+        proj_doc = proj_file.read()
+        generate_main_page(proj_name, proj_ver, "<pre>" + proj_doc + "</pre>")
     else:
         generate_main_page(proj_name, proj_ver, "")
     if os.path.isdir(rootdir):
@@ -351,7 +362,6 @@ def all_parsing(rootdir, proj_name, proj_ver):
                 if file.endswith('.h') or file.endswith('.cpp') or file.endswith('.hxx'):
                     file = open(os.path.join(subdir, file), 'r')
                     strings = file.readlines()
-
                     file_desc_list = list()
                     includes = list()
                     desc_file=list()

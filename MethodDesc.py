@@ -7,7 +7,10 @@ class MethodDesc(Description):
 
     def generate_name(self):
         name = "Method "
-        name += "<a href=#" + self.name + " >" +self.type+" "+ self.name + "</a>"
+        name += "<a href=#" + self.name.replace('<','&lt'
+        ).replace('>','&gt') + " >" +self.type.replace('<','&lt'
+        ).replace('>','&gt')+" "+ self.name.replace('<','&lt'
+        ).replace('>','&gt') + "</a>"
         if self.get_brief_desc() != '':
             name += "<br>" +"<pre>" + self.get_brief_desc()+"</pre>"
         return "<li class=\"list-group-item\"><p>" + name + "</p></li>\n"
@@ -15,7 +18,8 @@ class MethodDesc(Description):
     def generate_card(self, parent_name=None):
         card = ''
         card += card1
-        card += "<a " + "id=" + self.name + "></a>"
+        card += "<a " + "id=" + self.name.replace('<','&lt'
+        ).replace('>','&gt') + "></a>"
         card += "Function "
         card += self.type+" "+self.name if self.name != "DEFAULT" else ""
         card += card2

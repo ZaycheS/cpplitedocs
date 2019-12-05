@@ -18,7 +18,7 @@ def method_str_handler(string, method_desc):
             method_desc.name += ' ' + init_str[k].split('(', 1)[0]
             break
         else:
-            method_desc.name += ' ' + init_str[k]
+            method_desc.type += ' ' + init_str[k]
     method_desc.name=method_desc.name.strip()
     ending = string.split('(', 1)[1]
     result = string_parentheses_skip(ending, '(')
