@@ -10,7 +10,10 @@ class Description:
         self.__brief_desc = brief_desc
 
     def get_detailed_desc(self):
-        return self.__detailed_desc
+        desc = '<p class="font-italic">'+(self.__detailed_desc).replace('\n', '<br>').replace('\\return', "<br><strong>Returns:</strong>").replace(
+            '\\param', "<br><strong>Parameter:</strong>").replace('@return', "<br><strong>Returns:</strong>").replace(
+            '@param', "<br><strong>Parameter:</strong>")+'</p>'
+        return desc
 
     def get_brief_desc(self):
         return self.__brief_desc

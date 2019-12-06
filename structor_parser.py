@@ -33,7 +33,10 @@ def structor_str_handler(string, structor_desc):
             continue
         parameter.set_type(param_comps[j].strip())
         if j + 1 < len(param_comps):
-            parameter.set_name(param_comps[j + 1].strip())
+            if j+2<len(param_comps) and param_comps[j+1]== '*':
+                parameter.set_name(param_comps[j+1].strip()+param_comps[j+2].strip())
+            else:
+                parameter.set_name(param_comps[j + 1].strip())
             structor_desc.add_parameter(parameter)
 
 
@@ -52,7 +55,7 @@ def structor_parser(strings, structor_desc):
         method += strings[j].strip()
     structor_str_handler(method, structor_desc)
     if method.strip().endswith(';'):
-        return i
+        return max(i,1)
     k = parentheses_skip(strings, 0)
 
-    return k
+    return max(k,1)

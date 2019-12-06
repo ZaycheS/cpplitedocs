@@ -4,8 +4,8 @@ from typename import TypeName
 
 def enum_def_handler(enum_def, enum_desc):
     enum_def_words = enum_def.split()
-    if len(enum_def_words) > 1:
-        enum_desc.set_name(enum_def_words[1])
+    if len(enum_def_words) > 1 and enum_def_words[1].replace('{','')!="":
+        enum_desc.set_name(enum_def_words[1].replace('{',''))
     else:
         enum_desc.set_name("DEFAULT")
     temp_parent = TypeName()
@@ -25,11 +25,4 @@ def enum_def_handler(enum_def, enum_desc):
 def enum_parser(strings, enum_desc):
     enum_def_handler(strings[0], enum_desc)
     i = parentheses_skip(strings, 0, '{')
-    # enumers_string = ''
-    # for j in range(i):
-    #     enumers_string += strings[j].strip()
-    #
-    # enumers=enumers_string.split('{')[1].split('}')[0].split(',')
-    # for k in enumers:
-    #     enum_desc.enumers.append(k)
     return i

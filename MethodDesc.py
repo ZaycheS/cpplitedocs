@@ -1,27 +1,29 @@
-from description import Description
 from util import *
-
-
-class StructorDesc(Description):
+from description import Description
+class MethodDesc(Description):
     name = ''
-    type = bool()  # True-constructor False -destructor
+    type = ''
     parameters = list()
 
     def generate_name(self):
-        name = "Constructor " if self.type else "Destructor "
-        name += "<a href=#" + self.name + " >" + self.name + "</a>"
+        name = "Method "
+        name += "<a href=#" + self.name.replace('<','&lt'
+        ).replace('>','&gt') + " >" +self.type.replace('<','&lt'
+        ).replace('>','&gt')+" "+ self.name.replace('<','&lt'
+        ).replace('>','&gt') + "</a>"
         if self.get_brief_desc() != '':
-            name += "<br>" + "<pre>" + self.get_brief_desc() + "</pre>"
+            name += "<br>" +"<pre>" + self.get_brief_desc()+"</pre>"
         return "<li class=\"list-group-item\"><p>" + name + "</p></li>\n"
 
     def generate_card(self, parent_name=None):
         card = ''
         card += card1
-        card += "Constructor " if self.type else "Destructor "
-        card += "<a " + "id=" + self.name + "></a>"
-        card += self.name if self.name != "DEFAULT" else ""
+        card += "<a " + "id=" + self.name.replace('<','&lt'
+        ).replace('>','&gt') + "></a>"
+        card += "Function "
+        card += self.type+" "+self.name if self.name != "DEFAULT" else ""
         card += card2
-        card += "<pre>" + str(self.get_detailed_desc()) + "</pre>"
+        card += str(self.get_detailed_desc())
         if len(self.keywords) > 0:
             card += card2_q
             for i in self.keywords:
@@ -30,23 +32,18 @@ class StructorDesc(Description):
             card += card3_2
             for i in self.parameters:
                 if i.name is not None and i.name != "DEFAULT":
-                    card += i.type + " " + i.name + "<br>"
+                    card += i.type+" "+i.name + "<br>"
         if parent_name is not None:
             card += card4 + " " + parent_name
         card += card5
         return card
 
     def __str__(self):
-        string = 'STRUCTOR OF ' + self.name + ' type:'
-        if self.type:
-            string += ' constructor'
-        else:
-            string += ' destructor'
-        string += ' attributes:' + ' '.join(
+        return 'Description of ' + self.name + ' type:' + self.type + ' attributes:' + ' '.join(
             map(str, self.parameters)) + '\nKeywords:' + ' '.join(
             map(str,
-                self.keywords)) + '\nBrief description:' + self.get_brief_desc() + '\nDetailed desription:\n' + self.get_detailed_desc() + '\n'
-        return string
+                self.keywords)) + '\nBrief description:' + self.get_brief_desc() + '\nDetailed desсription:\n' \
+               + self.get_detailed_desc() + '\n'
 
     def __init__(self):
         self.set_detailed_desc("Here must be description, but here isn't")

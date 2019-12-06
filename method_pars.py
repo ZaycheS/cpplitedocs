@@ -18,7 +18,7 @@ def method_str_handler(string, method_desc):
             method_desc.name += ' ' + init_str[k].split('(', 1)[0]
             break
         else:
-            method_desc.name += ' ' + init_str[k]
+            method_desc.type += ' ' + init_str[k]
     method_desc.name=method_desc.name.strip()
     ending = string.split('(', 1)[1]
     result = string_parentheses_skip(ending, '(')
@@ -42,7 +42,10 @@ def method_str_handler(string, method_desc):
             continue
         parameter.set_type(param_comps[j].strip())
         if j + 1 < len(param_comps):
-            parameter.set_name(param_comps[j + 1].strip())
+            if j+2<len(param_comps) and param_comps[j]== '*':
+                parameter.set_name(param_comps[j+1].strip()+param_comps[j+2].strip())
+            else:
+                parameter.set_name(param_comps[j + 1].strip())
             method_desc.add_parameter(parameter)
 
 
